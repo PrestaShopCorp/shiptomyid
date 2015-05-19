@@ -75,7 +75,9 @@ $id_country = (int)Db::getInstance()->getValue('SELECT id_country FROM '._DB_PRE
  */
 $id_state = 0;
 if (!empty($region) && $id_country)
-	$id_state = (int)Db::getInstance()->getValue('SELECT id_state FROM '._DB_PREFIX_.'state WHERE LOWER(name) = LOWER("'.$region.'") AND id_country = '.(int)$id_country);
+	$id_state = (int)Db::getInstance()->getValue(
+													'SELECT id_state FROM '._DB_PREFIX_.'state WHERE LOWER(name) = LOWER("'.$region.'") AND id_country = '.(int)$id_country
+												);
 
 $new_address = new Address();
 $new_address->alias = 'SHIP2MYID-'.Tools::passwdGen(6);

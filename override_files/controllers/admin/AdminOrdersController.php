@@ -74,6 +74,7 @@ class AdminOrdersController extends AdminOrdersControllerCore
 	public function getShiptoOrder($value, $tr)
 	{
 		/** @var Shiptomyid $module */
+		$tr = isset($tr) && !empty($tr)?$tr:null;
 		$module = Module::getInstanceByName('shiptomyid');
 		if ($module->hasShiptomyidOption($value))
 			return $this->l('Ship2MyId Order');
@@ -106,7 +107,7 @@ class AdminOrdersController extends AdminOrdersControllerCore
 		$module = Module::getInstanceByName('shiptomyid');
 		if ($module->hasShiptomyidOption($value))
 		{
-			if ($tr['current_state'] == Shiptomyid::$OS_PS_CANCELED || $tr['current_state'] == Shiptomyid::$OS_CANCEL)
+			if ($tr['current_state'] == Shiptomyid::$os_ps_canceled || $tr['current_state'] == Shiptomyid::$os_cancel)
 				return $this->l('Rejected');
 			elseif ($tr['state_address'])
 				return $this->l('Accepted');

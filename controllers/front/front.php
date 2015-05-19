@@ -15,9 +15,9 @@
 class ShiptomyidFrontModuleFrontController extends ModuleFrontController
 {
 
-	public function Init()
+	public function init()
 	{
-		parent::Init();
+		parent::init();
 
 		$this->display_column_left = false;
 	}
@@ -90,7 +90,8 @@ class ShiptomyidFrontModuleFrontController extends ModuleFrontController
 				unset($customer_addresses[$i]);
 			$tmp_address = new Address($address['id_address']);
 			$formated_address_fields_values_list[$address['id_address']]['ordered_fields'] = AddressFormat::getOrderedAddressFields($address['id_country']);
-			$formated_address_fields_values_list[$address['id_address']]['formated_fields_values'] = AddressFormat::getFormattedAddressFieldsValues($tmp_address, $formated_address_fields_values_list[$address['id_address']]['ordered_fields']);
+			$formated_address_fields_values_list[$address['id_address']]['formated_fields_values'] = AddressFormat::getFormattedAddressFieldsValues(
+				$tmp_address, $formated_address_fields_values_list[$address['id_address']]['ordered_fields']);
 
 			unset($tmp_address);
 		}

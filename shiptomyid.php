@@ -28,12 +28,12 @@ class Shiptomyid extends Module
 
 	public $api;
 
-	public static $OS_WAITING;
-	public static $OS_READY;
-	public static $OS_ERROR;
-	public static $OS_CANCEL;
-	public static $OS_PS_CANCELED;
-	public static $OS_PS_DELIVERED;
+	public static $os_waiting;
+	public static $os_ready;
+	public static $os_error;
+	public static $os_cancel;
+	public static $os_ps_canceled;
+	public static $os_ps_delivered;
 
 	public function __construct()
 	{
@@ -42,24 +42,25 @@ class Shiptomyid extends Module
 		$this->author = 'NewQuest';
 		$this->version = '1.0.1';
 		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
-		$this->module_key = "473d95eea00946df7f84cbb445f94240";
-		
+		$this->module_key = '473d95eea00946df7f84cbb445f94240';
+
 		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true) // For PS_1.6
 			$this->bootstrap = true;
 
 		parent::__construct();
 
 		$this->displayName = $this->l('Ship2MyId');
-		$this->description = $this->l('Send real gifts and packages to an email, mobile phone or social account, Increase your online transactions, Increasing your customer base.');
+		$this->description = $this->l('Send real gifts and packages to an email, 
+		mobile phone or social account, Increase your online transactions, Increasing your customer base.');
 
 		// Configuration vars //
-		self::$OS_WAITING = Configuration::get('SHIPTOMYID_OS_WAITING');
-		self::$OS_READY = Configuration::get('SHIPTOMYID_OS_READY');
-		self::$OS_ERROR = Configuration::get('SHIPTOMYID_OS_ERROR');
-		self::$OS_CANCEL = Configuration::get('SHIPTOMYID_CANCEL_ORDER_STATE');
+		self::$os_waiting = Configuration::get('SHIPTOMYID_OS_WAITING');
+		self::$os_ready = Configuration::get('SHIPTOMYID_OS_READY');
+		self::$os_error = Configuration::get('SHIPTOMYID_OS_ERROR');
+		self::$os_cancel = Configuration::get('SHIPTOMYID_CANCEL_ORDER_STATE');
 
-		self::$OS_PS_CANCELED = Configuration::get('PS_OS_CANCELED');
-		self::$OS_PS_DELIVERED = Configuration::get('PS_OS_DELIVERED');
+		self::$os_ps_canceled = Configuration::get('PS_OS_CANCELED');
+		self::$os_ps_delivered = Configuration::get('PS_OS_DELIVERED');
 
 		// Instanciate API //
 		$this->api = new ShiptoAPI();
@@ -80,7 +81,8 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_BASE64_MODE', 0);
 		Configuration::updateValue('SHIPTOMYID_USERNAME', '');
 		Configuration::updateValue('SHIPTOMYID_PASSWORD', '');
-		Configuration::updateValue('SHIPTOMYID_WEBSERVICE_URL', Configuration::get('PS_SSL_ENABLED')?'https://hotfix-app.mapmyid.com/ship2myid/rest/':'http://hotfix-app.mapmyid.com/ship2myid/rest/');
+		Configuration::updateValue('SHIPTOMYID_WEBSERVICE_URL', Configuration::get('PS_SSL_ENABLED')
+		?'https://hotfix-app.mapmyid.com/ship2myid/rest/':'http://hotfix-app.mapmyid.com/ship2myid/rest/');
 		Configuration::updateValue('SHIPTOMYID_TERMS_URL', 'http://www.ship2myid.com/terms-of-use');
 		Configuration::updateValue('SHIPTOMYID_PRIVACY_URL', 'http://www.ship2myid.com/privacy');
 		Configuration::updateValue('SHIPTOMYID_VIDEO_LINK', 'http://www.youtube.com/watch?v=_4yvWDuyCis');
@@ -92,7 +94,9 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_DEFAULT_ADDR_ALIAS', 'Ship2MyId');
 		Configuration::updateValue('SHIPTOMYID_DEFAULT_ADDR_COUNTRY', Configuration::get('PS_COUNTRY_DEFAULT'));
 		Configuration::updateValue('SHIPTOMYID_DEFAULT_ADDR_STATE', 0);
-		Configuration::updateValue('SHIPTOMYID_POPUP_URL', Configuration::get('PS_SSL_ENABLED')?'https://hotfix-app.mapmyid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop':'http://hotfix-app.mapmyid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop');
+		Configuration::updateValue('SHIPTOMYID_POPUP_URL', Configuration::get('PS_SSL_ENABLED')
+		?'https://hotfix-app.mapmyid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop'
+		:'http://hotfix-app.mapmyid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop');
 		Configuration::updateValue('SHIPTOMYID_POPUP_WIDTH', '634');
 		Configuration::updateValue('SHIPTOMYID_POPUP_HEIGHT', '774');
 		Configuration::updateValue('SHIPTOMYID_CANCEL_ORDER_STATE', Configuration::get('PS_OS_CANCELED'));
@@ -245,7 +249,8 @@ class Shiptomyid extends Module
 		if (in_array($current_step, array(0, 1)) && !Tools::getIsset('ajax'))
 		{
 			$ids_address = Db::getInstance()->ExecuteS('SELECT a.id_address FROM '._DB_PREFIX_.'address a
-				WHERE a.id_address NOT IN (SELECT DISTINCT o.id_address_delivery FROM '._DB_PREFIX_.'orders o WHERE id_customer = '.(int)$this->context->customer->id.')
+				WHERE a.id_address NOT IN 
+				(SELECT DISTINCT o.id_address_delivery FROM '._DB_PREFIX_.'orders o WHERE id_customer = '.(int)$this->context->customer->id.')
 				AND a.id_customer = '.(int)$this->context->customer->id.' AND a.alias LIKE "SHIP2MYID%"
 			');
 
@@ -341,18 +346,18 @@ class Shiptomyid extends Module
 			else
 			{
 				// Check canceled and complete state on order and send it to shiptomyid
-				if ($new_order_state->id == self::$OS_PS_CANCELED)
+				if ($new_order_state->id == self::$os_ps_canceled)
 				{
-					$result = $this->api->cancelOrder($shipto_order->id_shiptomyid);
+					$this->api->cancelOrder($shipto_order->id_shiptomyid);
 
 					ShiptomyidOrder::addMessageToOrder($shipto_order->id_order, $this->l('Order Canceled send to ship2myid.'));
 
 					$this->api->closeSession();
 				}
-				elseif ($new_order_state->id == self::$OS_PS_DELIVERED)
+				elseif ($new_order_state->id == self::$os_ps_delivered)
 				{
 
-					$result = $this->api->completeOrder($shipto_order->id_shiptomyid);
+					$this->api->completeOrder($shipto_order->id_shiptomyid);
 
 					ShiptomyidOrder::addMessageToOrder($shipto_order->id_order, $this->l('Order Complete send to ship2myid.'));
 
@@ -391,7 +396,7 @@ class Shiptomyid extends Module
 			return false;
 
 		$order = new Order($shipto_order->id_order);
-		if ($order->current_state == self::$OS_PS_CANCELED || $order->current_state == self::$OS_CANCEL)
+		if ($order->current_state == self::$os_ps_canceled || $order->current_state == self::$os_cancel)
 			return false;
 
 		$shipto_order->country_name = Country::getNameById($this->context->language->id, $shipto_order->id_country);
@@ -470,7 +475,7 @@ class Shiptomyid extends Module
 			$new_shipto_order->state_send = 1;
 			if ($new_shipto_order->add())
 			{
-				ShiptomyidOrder::changeOrderStatus($order->id, self::$OS_WAITING);
+				ShiptomyidOrder::changeOrderStatus($order->id, self::$os_waiting);
 
 				ShiptomyidOrder::addMessageToOrder($order->id, $this->l('Add order in Ship2MyId : #'.$new_shipto_order->id_shiptomyid));
 
@@ -483,29 +488,29 @@ class Shiptomyid extends Module
 		}
 		else
 		{
-			ShiptomyidOrder::changeOrderStatus($order->id, self::$OS_ERROR);
+			ShiptomyidOrder::changeOrderStatus($order->id, self::$os_error);
 
 			ShiptomyidOrder::addMessageToOrder($order->id, ShiptoAPI::getErrorMessage($result));
 		}
 
 		return false;
-	}       
+	}
 
 	public function getOrderData($order)
 	{
 		$xml = new DOMDocument('1.0', 'utf-8');
-		$xmlRoot = $xml->createElement('OrderDetails');
-		$xml->appendChild($xmlRoot);
+		$xml_root = $xml->createElement('OrderDetails');
+		$xml->appendChild($xml_root);
 
 		$cart = Cart::getCartByOrderId((int)$order->id);
 		$products = $cart->getProducts();
-		if (count($products)) 
+		if (count($products))
 		{
-			foreach ($products as $product) 
+			foreach ($products as $product)
 			{
 				$item_id = $product['id_product'];
 				$order_id = (int)$order->id;
-				$product_id = $product['id_product'];
+				//$product_id = $product['id_product'];
 				$product_sku = $product['name'].'_'.$product['id_product'];
 				$product_name = $product['name'];
 				$qty = $product['cart_quantity'];
@@ -514,38 +519,38 @@ class Shiptomyid extends Module
 				$taxtotal = '0';
 				$grandtotal = '0';
 
-				$xmlItem = $xml->createElement('Item');
-				$xmlItem->appendChild($xml->createTextNode($product_name));
-				$domAttribute = $xml->createAttribute('MerchentOrderRecordRef');
-				$domAttribute->value = $order_id;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('MerchentOrderRecordLineRef');
-				$domAttribute->value = $item_id;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('Sku');
-				$domAttribute->value = $product_sku;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('Qty');
-				$domAttribute->value = $qty;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('Price');
-				$domAttribute->value = $price;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('LineSubTotal');
-				$domAttribute->value = $subtotal;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('LineTaxesTotal');
-				$domAttribute->value = $taxtotal;
-				$xmlItem->appendChild($domAttribute);
-				$domAttribute = $xml->createAttribute('LineTotal');
-				$domAttribute->value = $grandtotal;
-				$xmlItem->appendChild($domAttribute);
-				$xmlRoot->appendChild($xmlItem);
+				$xml_item = $xml->createElement('Item');
+				$xml_item->appendChild($xml->createTextNode($product_name));
+				$dom_attribute = $xml->createAttribute('MerchentOrderRecordRef');
+				$dom_attribute->value = $order_id;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('MerchentOrderRecordLineRef');
+				$dom_attribute->value = $item_id;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('Sku');
+				$dom_attribute->value = $product_sku;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('Qty');
+				$dom_attribute->value = $qty;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('Price');
+				$dom_attribute->value = $price;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('LineSubTotal');
+				$dom_attribute->value = $subtotal;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('LineTaxesTotal');
+				$dom_attribute->value = $taxtotal;
+				$xml_item->appendChild($dom_attribute);
+				$dom_attribute = $xml->createAttribute('LineTotal');
+				$dom_attribute->value = $grandtotal;
+				$xml_item->appendChild($dom_attribute);
+				$xml_root->appendChild($xml_item);
 			}
 		}
 
-		$xmlOrderDetails = $xml->saveXML();
-		return $xmlOrderDetails;
+		$xml_order_details = $xml->saveXML();
+		return $xml_order_details;
 	}
 
 	public function finalizeSendErrorOrder($id_order, $id_shipto_order)
@@ -560,7 +565,7 @@ class Shiptomyid extends Module
 		$new_shipto_order->state_send = 1;
 		if ($new_shipto_order->add())
 		{
-			ShiptomyidOrder::changeOrderStatus($id_order, self::$OS_WAITING);
+			ShiptomyidOrder::changeOrderStatus($id_order, self::$os_waiting);
 
 			ShiptomyidOrder::addMessageToOrder($id_order, $this->l('Add order in Ship2MyId : #'.$new_shipto_order->id_shiptomyid));
 		}
@@ -607,10 +612,10 @@ class Shiptomyid extends Module
 				);
 				$shipto_order->setDeliveryAddress($data);
 
-				$order_state = new OrderState(self::$OS_READY);
+				$order_state = new OrderState(self::$os_ready);
 				if (Validate::isLoadedObject($order_state))
 				{
-					ShiptomyidOrder::changeOrderStatus($id_order, self::$OS_READY);
+					ShiptomyidOrder::changeOrderStatus($id_order, self::$os_ready);
 
 					ShiptomyidOrder::addMessageToOrder($id_order, $this->l('Order is ready to delivery.').'<br/><pre>'.print_r($data, true).'</pre>');
 				}
@@ -619,10 +624,10 @@ class Shiptomyid extends Module
 			{
 				$result_data = $result['ExternalOrder'];
 
-				$order_state = new OrderState(self::$OS_CANCEL);
+				$order_state = new OrderState(self::$os_cancel);
 				if (Validate::isLoadedObject($order_state))
 				{
-					ShiptomyidOrder::changeOrderStatus($id_order, self::$OS_CANCEL);
+					ShiptomyidOrder::changeOrderStatus($id_order, self::$os_cancel);
 
 					ShiptomyidOrder::addMessageToOrder($id_order, $this->l('Order is rejected : ').$result_data['receiver_rejected_note']);
 				}
@@ -713,8 +718,11 @@ class Shiptomyid extends Module
 		);
 
 		$countries = CountryCore::getCountries($this->context->language->id);
-		$states = StateCore::getStates($this->context->language->id);
-		$states = array_merge(array(array('id_state' => 0, 'name' => '-')), $states);
+		$all_states = StateCore::getStates($this->context->language->id);
+		$states = array();
+		foreach ($all_states as $row)
+			$states[$row['id_country']][] = $row;
+		$empty_states = array(array('id_state' => 0, 'name' => '-'));
 		$order_state = OrderState::getOrderStates($this->context->language->id);
 
 		$fields_form = array(
@@ -803,7 +811,7 @@ class Shiptomyid extends Module
 						'label' => $this->l('Default region/state'),
 						'name' => 'SHIPTOMYID_DEFAULT_ADDR_STATE',
 						'options' => array(
-							'query' => $states,
+							'query' => $empty_states,
 							'id' => 'id_state',
 							'name' => 'name',
 						)
@@ -875,6 +883,10 @@ class Shiptomyid extends Module
 						'label' => $this->l('Check order cron URL'),
 						'name' => 'cron_link'
 					),
+					array(
+						'type' => 'free',
+						'name' => 'js_data'
+					),
 				),
 				'submit' => array(
 					'title' => $this->l('Save'),
@@ -886,7 +898,7 @@ class Shiptomyid extends Module
 
 		$helper->submit_action = 'btnSubmit';
 		$helper->tpl_vars = array(
-			'fields_value' => $this->getConfigFieldsValues(),
+			'fields_value' => $this->getConfigFieldsValues($states),
 			'languages' => $this->context->controller->getLanguages(),
 			'id_language' => $this->context->language->id
 		);
@@ -895,13 +907,14 @@ class Shiptomyid extends Module
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name
+		.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 
 		return $helper->generateForm(array($fields_form));
 	}
 
-	private function getConfigFieldsValues()
+	private function getConfigFieldsValues($states)
 	{
 		return array(
 			'secureKey' => 1,
@@ -930,7 +943,33 @@ class Shiptomyid extends Module
 
 			'SHIPTOMYID_CANCEL_ORDER_STATE' => Tools::getValue('SHIPTOMYID_CANCEL_ORDER_STATE', Configuration::get('SHIPTOMYID_CANCEL_ORDER_STATE')),
 
-			'cron_link' => '<a target="_blank" class="button" href="'.__PS_BASE_URI__.'modules/'.$this->name.'/crons/check_orders.php">'.$this->l('Start cron check order process').'</a>',
+			'cron_link' => '<div style="padding-top:5px"><a target="_blank" class="button" 
+			href="'.__PS_BASE_URI__.'modules/'.$this->name.'/crons/check_orders.php">'.
+			$this->l('Start cron check order process').'</a></div>',
+
+			'js_data' => '<script type="text/javascript">$(function(){
+			var states_tab = '.Tools::jsonEncode($states).';
+			var current_state = '.(int)Tools::getValue('SHIPTOMYID_DEFAULT_ADDR_STATE', Configuration::get('SHIPTOMYID_DEFAULT_ADDR_STATE')).';
+			$("#SHIPTOMYID_DEFAULT_ADDR_COUNTRY").change(function(){
+				console.log("change country");
+				change_state_select($(this).val());
+			});
+			change_state_select($("#SHIPTOMYID_DEFAULT_ADDR_COUNTRY").val());
+			function change_state_select(current_country){
+				console.log("chnage_state to "+current_country);
+				var default_state_select = $("#SHIPTOMYID_DEFAULT_ADDR_STATE");
+				default_state_select.empty();
+				default_state_select.append(\'<option value="0">---</option>\');
+				if (typeof states_tab[current_country] != "undefined") {
+					for (var i in states_tab[current_country]) {
+						default_state_select.append(\'<option value="\'+states_tab[current_country][i][\'id_state\']+\'">\'
+						+states_tab[current_country][i][\'name\']+\'</option>\');
+					}
+				}
+				default_state_select.val(current_state);
+			}
+			console.log("State js load");
+			});</script>',
 		);
 	}
 }

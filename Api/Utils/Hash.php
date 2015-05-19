@@ -43,6 +43,8 @@ class Hash
 	{
 		$args = func_get_args();
 		$return = current($args);
+		$data = !is_array($data)?array():$data;
+		$merge = !empty($merge)?$merge:null;
 
 		while (($arg = next($args)) !== false)
 			foreach ((array)$arg as $key => $val)

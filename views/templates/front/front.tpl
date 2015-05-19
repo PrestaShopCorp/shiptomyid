@@ -113,7 +113,7 @@ function getFieldValue(field_name, values)
 {assign var='current_step' value='address'}
 {include file="$tpl_dir./order-steps.tpl"}
 {include file="$tpl_dir./errors.tpl"}
-<form action="{$link->getPageLink($back_order_page, true)|escape:'html'}" method="post">
+<form action="{$link->getPageLink($back_order_page, true)|escape:'htmlall':'UTF-8'}" method="post">
 
 	<div class="addresses clearfix">
 		<p class="address_delivery select">
@@ -142,7 +142,7 @@ function getFieldValue(field_name, values)
 
 	<p class="cart_navigation submit">
 		<input type="hidden" class="hidden" name="step" value="2" />
-		<a href="{$link->getPageLink($back_order_page, true, NULL, "step=0{if isset($back) && $back}&back={$back}{/if}")|escape:'html'}" title="{l s='Previous'  mod='shiptomyid'}" class="button">&laquo; {l s='Previous'  mod='shiptomyid'}</a>
+		<a href="{$link->getPageLink($back_order_page, true, NULL, "step=0{if isset($back) && $back}&back={$back}{/if}")|escape:'htmlall':'UTF-8'}" title="{l s='Previous'  mod='shiptomyid'}" class="button">&laquo; {l s='Previous'  mod='shiptomyid'}</a>
 		<input type="submit" name="processAddress" value="{l s='Next' mod='shiptomyid'} &raquo;" class="exclusive" />
 	</p>
 </form>

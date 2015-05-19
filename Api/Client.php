@@ -30,7 +30,7 @@ class Client extends RestClient
 	 */
 	public function sessionStart(array $options = null)
 	{
-
+		$options = !is_array($options)?array():$options;
 	}
 
 	/**
