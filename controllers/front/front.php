@@ -28,11 +28,17 @@ class ShiptomyidFrontModuleFrontController extends ModuleFrontController
 
 		// Add CSS files //
 		$this->addCSS(_THEME_CSS_DIR_.'addresses.css');
-		$this->addCSS(__PS_BASE_URI__.'modules/'.$this->module->name.'/views/css/shiptomyid.css', 'all');
+		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true)
+			$this->addCSS(__PS_BASE_URI__.'modules/'.$this->module->name.'/views/css/shiptomyid-16.css', 'all');
+		else
+			$this->addCSS(__PS_BASE_URI__.'modules/'.$this->module->name.'/views/css/shiptomyid.css', 'all');
 
 		// Add JS files //
 		$this->addJS(_THEME_JS_DIR_.'tools.js');
-		$this->addJS(__PS_BASE_URI__.'modules/'.$this->module->name.'/views/js/shipto-address.js');
+		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true)
+			$this->addJS(__PS_BASE_URI__.'modules/'.$this->module->name.'/views/js/shipto-address-16.js');
+		else
+			$this->addJS(__PS_BASE_URI__.'modules/'.$this->module->name.'/views/js/shipto-address.js');
 	}
 
 	public function initContent()
@@ -78,7 +84,7 @@ class ShiptomyidFrontModuleFrontController extends ModuleFrontController
 
 		// On supprime de la liste les addresse shipto
 		foreach ($customer_addresses as $key => $address)
-			if (strpos($address['alias'], 'SHIP2MYID') !== false)
+			if (strpos(Tools::strtolower($address['alias']), 'ship2myid') !== false)
 				$customer_addresses[$key]['shipto_addr'] = 1;
 
 		// Getting a list of formated address fields with associated values
@@ -102,6 +108,9 @@ class ShiptomyidFrontModuleFrontController extends ModuleFrontController
 			'formatedAddressFieldsValuesList' => $formated_address_fields_values_list
 		));
 
-		$this->setTemplate('front.tpl');
+		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true)
+			$this->setTemplate('front-16.tpl');
+		else
+			$this->setTemplate('front.tpl');
 	}
 }
