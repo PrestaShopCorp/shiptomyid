@@ -18,7 +18,7 @@
  * @author Jonathan SAHM <j.sahm@newquest.fr>
  * @package NewQuest\Client\Rest
  */
-class RestException extends \Exception
+class RestException extends Exception
 {
 
 }

@@ -62,10 +62,7 @@ abstract class RestClient implements RestClientInterface
 			$url = static::$url[$name];
 
 			if (!is_null($options))
-				$url = preg_replace_callback('#\{([a-z0-9_]+)\}#', function ($match) use ($options)
-				{
-					return isset($options[$match[1]]) ? $options[$match[1]] : null;
-				}, $url);
+				$url = preg_replace('#\{([a-z0-9_]+)\}#e', 'isset($options["$1"]) ? $options["$1"] : null', $url);
 
 			if (!is_null($args))
 			{
