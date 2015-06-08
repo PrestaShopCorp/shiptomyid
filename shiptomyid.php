@@ -41,7 +41,6 @@ class Shiptomyid extends Module
 		$this->tab = 'smart_shopping';
 		$this->author = 'NewQuest';
 		$this->version = '1.0.1';
-		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
 		$this->module_key = '473d95eea00946df7f84cbb445f94240';
 
 		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true) // For PS_1.6
@@ -100,17 +99,6 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_POPUP_WIDTH', '634');
 		Configuration::updateValue('SHIPTOMYID_POPUP_HEIGHT', '774');
 		Configuration::updateValue('SHIPTOMYID_CANCEL_ORDER_STATE', Configuration::get('PS_OS_CANCELED'));
-		return true;
-	}
-
-	/**
-	 * Desinstallation du module.
-	 */
-	public function uninstall()
-	{
-		if (!parent::uninstall())
-			return false;
-
 		return true;
 	}
 
@@ -176,8 +164,11 @@ class Shiptomyid extends Module
 	 */
 	private function installExternalOrderState()
 	{
+		$languages = Language::getLanguages();
+
 		$os_add_object = new OrderState();
-		$os_add_object->name[Configuration::get('PS_LANG_DEFAULT')] = 'Waiting address';
+		foreach ($languages as $lang)
+			$os_add_object->name[$lang['id_lang']] = 'Waiting address';
 		$os_add_object->delivery = 0;
 		$os_add_object->invoice = 1;
 		$os_add_object->shipped = 0;
@@ -188,7 +179,8 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_OS_WAITING', (int)$os_add_object->id);
 
 		$os_add_object = new OrderState();
-		$os_add_object->name[Configuration::get('PS_LANG_DEFAULT')] = 'Ready to ship';
+		foreach ($languages as $lang)
+			$os_add_object->name[$lang['id_lang']] = 'Ready to ship';
 		$os_add_object->delivery = 0;
 		$os_add_object->invoice = 1;
 		$os_add_object->shipped = 0;
@@ -199,7 +191,8 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_OS_READY', (int)$os_add_object->id);
 
 		$os_add_object = new OrderState();
-		$os_add_object->name[Configuration::get('PS_LANG_DEFAULT')] = 'Invalid Ship2MyId Response';
+		foreach ($languages as $lang)
+			$os_add_object->name[$lang['id_lang']] = 'Invalid Ship2MyId Response';
 		$os_add_object->delivery = 0;
 		$os_add_object->invoice = 1;
 		$os_add_object->shipped = 0;
@@ -214,6 +207,9 @@ class Shiptomyid extends Module
 
 	public function isAvailable()
 	{
+		if (!$this->active)
+			return false;
+
 		if (!Configuration::get('SHIPTOMYID_ENABLE') || !Configuration::get('SHIPTOMYID_POPUP_URL')
 		|| !Configuration::get('SHIPTOMYID_USERNAME') || !Configuration::get('SHIPTOMYID_PASSWORD'))
 			return false;
