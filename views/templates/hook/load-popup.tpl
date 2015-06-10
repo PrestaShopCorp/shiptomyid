@@ -12,6 +12,7 @@
 	var video_url = "{$video_url|escape:'htmlall':'UTF-8'}";
 	var button_text = "{l s='I want to use Ship2MyId for my order.' mod='shiptomyid'}";
 	var link_text = "{l s='What is Ship2MyId ?' mod='shiptomyid'}";
+	var button_class = "{$button_class|escape:'htmlall':'UTF-8'}";
 
 	{literal}
 	$(document).ready(function(){
@@ -24,7 +25,7 @@
 			}
 		};
 
-		var shipto_button_code = '<a href="#" style="margin: 5px 0;" class="button_large" id="shiptomyidButton">'+button_text+'</a>';
+		var shipto_button_code = '<a href="#" style="margin: 5px 0;" class="'+button_class+'" id="shiptomyidButton"><span>'+button_text+'</span></a>';
 
 		if (video_url.length) {
 

@@ -266,11 +266,17 @@ class Shiptomyid extends Module
 		if (preg_match('/(.+www\.youtube\.com)\/watch\?v=([_0-9a-zA-Z]+)/', $youtube_link, $match))
 			$youtube_link = $match[1].'/embed/'.$match[2];
 
+		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true)
+			$button_class = 'button button-small btn btn-default';
+		else
+			$button_class = 'button_large';
+
 		// Chargement de la popup Shiptomyid //
 		$this->context->controller->addjqueryPlugin('fancybox');
 		$this->context->smarty->assign(array(
 			'popup_url' => Configuration::get('SHIPTOMYID_POPUP_URL'),
 			'video_url' => $youtube_link,
+			'button_class' => $button_class,
 			'popup_width' => Configuration::get('SHIPTOMYID_POPUP_WIDTH'),
 			'popup_height' => Configuration::get('SHIPTOMYID_POPUP_HEIGHT'),
 			'callback_url' => Tools::getShopDomain(true).__PS_BASE_URI__.'modules/'.$this->name.'/postdata.php?data='.$this->context->cart->id

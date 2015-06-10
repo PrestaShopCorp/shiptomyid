@@ -66,8 +66,8 @@
 
 	<p class="cart_navigation clearfix">
 		<input type="hidden" class="hidden" name="step" value="2" />
-		<input type="hidden" name="back" value="{$back}" />
-		<a href="{$link->getPageLink($back_order_page, true, NULL, "{if $back}back={$back}{/if}")|escape:'html':'UTF-8'}" title="{l s='Previous' mod='shiptomyid'}" class="button-exclusive btn btn-default">
+		<input type="hidden" name="back" value="{if isset($back) AND $back}{$back}{/if}" />
+		<a href="{$link->getPageLink($back_order_page, true, NULL, "{if isset($back) AND $back}back={$back}{/if}")|escape:'html':'UTF-8'}" title="{l s='Previous' mod='shiptomyid'}" class="button-exclusive btn btn-default">
 			<i class="icon-chevron-left"></i>
 			{l s='Continue Shopping' mod='shiptomyid'}
 		</a>
@@ -88,7 +88,7 @@
 	{addJsDefL name=txtProduct}{l s='product' js=1  mod='shiptomyid'}{/addJsDefL}
 	{addJsDefL name=txtProducts}{l s='products' js=1  mod='shiptomyid'}{/addJsDefL}
 	{addJsDefL name=CloseTxt}{l s='Submit' js=1  mod='shiptomyid'}{/addJsDefL}
-	{capture}{if $back}&mod={$back|urlencode}{/if}{/capture}
+	{capture}{if isset($back) AND $back}&mod={$back|urlencode}{/if}{/capture}
 	{capture name=addressUrl}{$link->getPageLink('address', true, NULL, 'back='|cat:$back_order_page|cat:'?step=1'|cat:$smarty.capture.default)|escape:'quotes':'UTF-8'}{/capture}
 	{addJsDef addressUrl=$smarty.capture.addressUrl}
 	{capture}{'&multi-shipping=1'|urlencode}{/capture}
