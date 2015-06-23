@@ -14,6 +14,10 @@
 
 require_once dirname(__FILE__).'/../../../config/config.inc.php';
 
+$key = Tools::getValue('token', '');
+if ($key != Configuration::get('SHIPTOMYID_CRON_TOKEN'))
+	exit;
+
 /** @var Shiptomyid $module */
 $module = Module::getInstanceByName('shiptomyid');
 
@@ -30,7 +34,7 @@ $orders = Db::getInstance()->ExecuteS('SELECT o.id_order, so.id_shiptomyid from 
 		WHERE tmp.id_order = o.id_order ORDER BY id_order_history DESC LIMIT 1
 	)
 	JOIN '._DB_PREFIX_.'shiptomyid_order so ON so.id_order = o.id_order
-	WHERE oh.id_order_state = '.Configuration::get('SHIPTOMYID_OS_WAITING'));
+	WHERE oh.id_order_state = '.(int)Configuration::get('SHIPTOMYID_OS_WAITING'));
 
 $ids_order = array ();
 $t_mapping_order = array ();
@@ -69,7 +73,7 @@ $orders = Db::getInstance()->ExecuteS('SELECT o.id_order, c.email, sc.* from '._
 	)
 	JOIN '._DB_PREFIX_.'shiptomyid_cart sc ON sc.id_cart = o.id_cart
 	JOIN '._DB_PREFIX_.'customer c ON c.id_customer = o.id_customer
-	WHERE oh.id_order_state = '.Configuration::get('SHIPTOMYID_OS_ERROR'));
+	WHERE oh.id_order_state = '.(int)Configuration::get('SHIPTOMYID_OS_ERROR'));
 
 echo '<br/>INVALID ORDERS<br/>';
 if ($orders)

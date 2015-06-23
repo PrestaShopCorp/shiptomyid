@@ -8,7 +8,7 @@
 *}
 
 <script type="text/javascript">
-	var popup_url = "{$popup_url}&callback={$callback_url|urlencode}";
+	var popup_url = "{$popup_url|escape:'htmlall':'UTF-8'}&callback={$callback_url|urlencode}";
 	var video_url = "{$video_url|escape:'htmlall':'UTF-8'}";
 	var button_text = "{l s='I want to use Ship2MyId for my order.' mod='shiptomyid'}";
 	var link_text = "{l s='What is Ship2MyId ?' mod='shiptomyid'}";
@@ -41,7 +41,7 @@
 
 		$("#shiptomyidButton").on('click', function(){
 
-			$.fancybox.open({href: popup_url}, {type:'iframe', height: {/literal}{$popup_height}{literal}, width: {/literal}{$popup_width}{literal}, helpers : {overlay : {closeClick: false}}});
+			$.fancybox.open({href: popup_url}, {type:'iframe', height: {/literal}{$popup_height|intval}{literal}, width: {/literal}{$popup_width|intval}{literal}, helpers : {overlay : {closeClick: false}}});
 		});
 
 		if ($("#shiptomyidVideo").length > 0) {

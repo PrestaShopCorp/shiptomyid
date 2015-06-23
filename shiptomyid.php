@@ -76,6 +76,7 @@ class Shiptomyid extends Module
 		|| !$this->registerHook('displayAdminOrder') || !$this->installSQL() || !$this->installExternalOrderState())
 			return false;
 
+		Configuration::updateValue('SHIPTOMYID_CRON_TOKEN', Tools::passwdGen(16));
 		Configuration::updateValue('SHIPTOMYID_ENABLE', 0);
 		Configuration::updateValue('SHIPTOMYID_BASE64_MODE', 0);
 		Configuration::updateValue('SHIPTOMYID_USERNAME', '');
@@ -271,6 +272,8 @@ class Shiptomyid extends Module
 		else
 			$button_class = 'button_large';
 
+		$key = md5($this->context->cart->id.'_'.$this->context->cart->secure_key);
+
 		// Chargement de la popup Shiptomyid //
 		$this->context->controller->addjqueryPlugin('fancybox');
 		$this->context->smarty->assign(array(
@@ -279,7 +282,7 @@ class Shiptomyid extends Module
 			'button_class' => $button_class,
 			'popup_width' => Configuration::get('SHIPTOMYID_POPUP_WIDTH'),
 			'popup_height' => Configuration::get('SHIPTOMYID_POPUP_HEIGHT'),
-			'callback_url' => Tools::getShopDomain(true).__PS_BASE_URI__.'modules/'.$this->name.'/postdata.php?data='.$this->context->cart->id
+			'callback_url' => Tools::getShopDomain(true).__PS_BASE_URI__.'modules/'.$this->name.'/postdata.php?data='.$this->context->cart->id.'&key='.$key
 		));
 
 		return $this->display(__FILE__, 'load-popup.tpl');
@@ -946,7 +949,7 @@ class Shiptomyid extends Module
 			'SHIPTOMYID_CANCEL_ORDER_STATE' => Tools::getValue('SHIPTOMYID_CANCEL_ORDER_STATE', Configuration::get('SHIPTOMYID_CANCEL_ORDER_STATE')),
 
 			'cron_link' => '<div style="padding-top:5px"><a target="_blank" class="button" 
-			href="'.__PS_BASE_URI__.'modules/'.$this->name.'/crons/check_orders.php">'.
+			href="'.__PS_BASE_URI__.'modules/'.$this->name.'/crons/check_orders.php?token='.Configuration::get('SHIPTOMYID_CRON_TOKEN').'">'.
 			$this->l('Start cron check order process').'</a></div>',
 
 			'js_data' => '<script type="text/javascript">$(function(){

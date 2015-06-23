@@ -55,10 +55,10 @@ class ShiptomyidFrontModuleFrontController extends ModuleFrontController
 			$shipto_delivery_address = new Address((int)$this->context->cart->id_address_delivery);
 
 			$country_name = Db::getInstance()->getValue('SELECT name FROM '._DB_PREFIX_.'country_lang
-		WHERE id_country = '.Configuration::get('SHIPTOMYID_DEFAULT_ADDR_COUNTRY').' ');
+		WHERE id_country = '.(int)Configuration::get('SHIPTOMYID_DEFAULT_ADDR_COUNTRY').' ');
 
 			$state_name = Db::getInstance()->getValue('SELECT name FROM '._DB_PREFIX_.'state
-		WHERE id_state = '.Configuration::get('SHIPTOMYID_DEFAULT_ADDR_STATE').' ');
+		WHERE id_state = '.(int)Configuration::get('SHIPTOMYID_DEFAULT_ADDR_STATE').' ');
 
 			$default_delivery_address = array(
 				'address1' => Configuration::get('SHIPTOMYID_DEFAULT_ADDR_ADDRESS'),
