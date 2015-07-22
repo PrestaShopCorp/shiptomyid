@@ -1,0 +1,8 @@
+.fancybox-inner iframe{
+background:url("../img/backgroundlight.jpg");
+padding-top:5px;    
+}
+.fancybox-skin{
+    padding: 1px !important;
+    background:url("../img/backgroundlight.jpg")
+}

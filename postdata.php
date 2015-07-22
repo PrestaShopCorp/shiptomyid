@@ -32,7 +32,7 @@ if (empty($_POST))
  * Check key
  */
 $check_key = md5($current_cart->id.'_'.$current_cart->secure_key);
-if (!Tools::getValue('key', false) OR Tools::getValue('key') != $check_key)
+if (!Tools::getValue('key', false) || Tools::getValue('key') != $check_key)
 	die('An error occurred...');
 
 /*
@@ -43,8 +43,18 @@ $receiver_linkedin_id = Tools::getValue('receiver_linkedin_id');
 $receiver_facebook_id = Tools::getValue('receiver_facebook_id');
 $postcode = Tools::getValue('postcode');
 $telephone = Toolbox::cleanPhone(Tools::getValue('telephone'));
+$rec_name = Toolbox::cleanName(Tools::getValue('firstname'));
+$rec_name = explode(' ', $rec_name, 2);
+if (is_array($rec_name) && !empty($rec_name))
+{
+$firstname = $rec_name[0];
+$lastname = isset($rec_name[1]) && !empty($rec_name[1]) ?$rec_name[1]:$rec_name[0];
+}
+else
+{
 $firstname = Toolbox::cleanName(Tools::getValue('firstname'));
 $lastname = Toolbox::cleanName(Tools::getValue('lastname'));
+}
 $email = Tools::getValue('email');
 $country_iso = Tools::getValue('country_id');
 $telephone_no = Toolbox::cleanPhone(Tools::getValue('telephone_no'));
@@ -60,9 +70,32 @@ if (!Validate::isEmail($email))
 /*
  * $sender_email = Db::getInstance()->getValue('SELECT email FROM '._DB_PREFIX_.'customer WHERE id_customer = '.(int)$current_cart->id_customer);
  */
+if ($receiver_type == 'email')
+{
 $info = array(
-	'email_address' => $email,
+	'receiver_type' => $receiver_type,
+	'receiver_email_address' => $email,
 );
+}elseif ($receiver_type == 'facebook')
+{
+$info = array(
+	'receiver_type' => $receiver_type,
+	'receiver_facebook_id' => $receiver_facebook_id,
+);
+}elseif ($receiver_type == 'linkedin')
+{
+$info = array(
+	'receiver_type' => $receiver_type,
+	'receiver_linkedin_id' => $receiver_linkedin_id,
+);
+}
+else
+{
+$info = array(
+	'receiver_type' => 'email',
+	'receiver_email_address' => $email,
+);
+}
 $results = $module->api->getZipAndState($info);
 if (isset($results['Address']))
 {
