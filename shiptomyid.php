@@ -40,7 +40,7 @@ class Shiptomyid extends Module
 		$this->name = 'shiptomyid';
 		$this->tab = 'smart_shopping';
 		$this->author = 'NewQuest';
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		$this->module_key = '473d95eea00946df7f84cbb445f94240';
 
 		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true) // For PS_1.6
