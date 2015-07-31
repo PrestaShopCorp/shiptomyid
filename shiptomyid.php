@@ -40,7 +40,7 @@ class Shiptomyid extends Module
 		$this->name = 'shiptomyid';
 		$this->tab = 'smart_shopping';
 		$this->author = 'NewQuest';
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		$this->module_key = '473d95eea00946df7f84cbb445f94240';
 
 		if (class_exists('Tools') && method_exists('Tools', 'version_compare') && Tools::version_compare(_PS_VERSION_, '1.6', '>=') === true) // For PS_1.6
@@ -49,8 +49,8 @@ class Shiptomyid extends Module
 		parent::__construct();
 
 		$this->displayName = $this->l('Ship2MyId');
-		$this->description = $this->l('Send real gifts and packages to an email, 
-		mobile phone or social account, Increase your online transactions, Increasing your customer base.');
+		$this->description = $this->l('Generate new transactions not possible before. Users can now ship to any cell, 
+		email or social ID without requiring address. It\'s like Paypal but for Shipping.');
 
 		// Configuration vars //
 		self::$os_waiting = Configuration::get('SHIPTOMYID_OS_WAITING');
@@ -82,7 +82,7 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_USERNAME', '');
 		Configuration::updateValue('SHIPTOMYID_PASSWORD', '');
 		Configuration::updateValue('SHIPTOMYID_WEBSERVICE_URL', Configuration::get('PS_SSL_ENABLED')
-		?'https://hotfix-app.mapmyid.com/ship2myid/rest/':'http://hotfix-app.mapmyid.com/ship2myid/rest/');
+		?'https://hotfix-app.ship2myid.com/ship2myid/rest/':'http://hotfix-app.ship2myid.com/ship2myid/rest/');
 		Configuration::updateValue('SHIPTOMYID_TERMS_URL', 'http://www.ship2myid.com/terms-of-use');
 		Configuration::updateValue('SHIPTOMYID_PRIVACY_URL', 'http://www.ship2myid.com/privacy');
 		Configuration::updateValue('SHIPTOMYID_VIDEO_LINK', 'http://www.youtube.com/watch?v=_4yvWDuyCis');
@@ -95,8 +95,8 @@ class Shiptomyid extends Module
 		Configuration::updateValue('SHIPTOMYID_DEFAULT_ADDR_COUNTRY', Configuration::get('PS_COUNTRY_DEFAULT'));
 		Configuration::updateValue('SHIPTOMYID_DEFAULT_ADDR_STATE', 0);
 		Configuration::updateValue('SHIPTOMYID_POPUP_URL', Configuration::get('PS_SSL_ENABLED')
-		?'https://hotfix-app.mapmyid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop'
-		:'http://hotfix-app.mapmyid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop');
+		?'https://hotfix-app.ship2myid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop'
+		:'http://hotfix-app.ship2myid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=prestashop');
 		Configuration::updateValue('SHIPTOMYID_POPUP_WIDTH', '634');
 		Configuration::updateValue('SHIPTOMYID_POPUP_HEIGHT', '774');
 		Configuration::updateValue('SHIPTOMYID_CANCEL_ORDER_STATE', Configuration::get('PS_OS_CANCELED'));
@@ -263,6 +263,17 @@ class Shiptomyid extends Module
 			return;
 
 		$youtube_link = Configuration::get('SHIPTOMYID_VIDEO_LINK');
+		if (isset($this->context->ship2myid->marketplace) && is_array($this->context->ship2myid->marketplace))
+			$marketplace_details = $this->context->ship2myid->marketplace;
+		else
+			$this->context->ship2myid->marketplace = $marketplace_details = $this->api->getMarketplaceDetails();
+
+		if (isset($marketplace_details['Marketplace']['marketplace_name']) && !empty($marketplace_details['Marketplace']['marketplace_name']))
+				$marketplace_name = $marketplace_details['Marketplace']['marketplace_name'];
+
+		if (isset($marketplace_details['Marketplace']['marketplace_image']) && !empty($marketplace_details['Marketplace']['marketplace_image']))
+				$marketplace_image = $marketplace_details['Marketplace']['marketplace_image'];
+
 		$match = array();
 		if (preg_match('/(.+www\.youtube\.com)\/watch\?v=([_0-9a-zA-Z]+)/', $youtube_link, $match))
 			$youtube_link = $match[1].'/embed/'.$match[2];
@@ -275,6 +286,7 @@ class Shiptomyid extends Module
 		$key = md5($this->context->cart->id.'_'.$this->context->cart->secure_key);
 
 		// Chargement de la popup Shiptomyid //
+		$this->context->controller->addCSS(__PS_BASE_URI__.'modules/'.$this->name.'/views/css/shiptomyid-fancybox.css', 'all');
 		$this->context->controller->addjqueryPlugin('fancybox');
 		$this->context->smarty->assign(array(
 			'popup_url' => Configuration::get('SHIPTOMYID_POPUP_URL'),
@@ -282,7 +294,9 @@ class Shiptomyid extends Module
 			'button_class' => $button_class,
 			'popup_width' => Configuration::get('SHIPTOMYID_POPUP_WIDTH'),
 			'popup_height' => Configuration::get('SHIPTOMYID_POPUP_HEIGHT'),
-			'callback_url' => Tools::getShopDomain(true).__PS_BASE_URI__.'modules/'.$this->name.'/postdata.php?data='.$this->context->cart->id.'&key='.$key
+			'callback_url' => Tools::getShopDomain(true).__PS_BASE_URI__.'modules/'.$this->name.'/postdata.php?data='.$this->context->cart->id.'&key='.$key,
+			'marketplace_name' => $marketplace_name,
+			'marketplace_image' => $marketplace_image
 		));
 
 		return $this->display(__FILE__, 'load-popup.tpl');
@@ -710,10 +724,27 @@ class Shiptomyid extends Module
 		if (!$this->checkCurl())
 			$this->html .= $this->displayError('ERROR : cUrl don\'t find on your server.');
 
+		$this->html .= $this->renderContent();
 		$this->html .= $this->renderForm();
 
 		return $this->html;
 	}
+
+	public function renderContent()
+	{
+		$enable = Configuration::get('SHIPTOMYID_ENABLE', Tools::getValue('SHIPTOMYID_ENABLE'));
+		$this->smarty->assign(array(
+		'css_file' => $this->_path.'/views/css/shiptomyid-config.css',
+		'path' => $this->_path.'/views/',
+		'youtube_link'	=> 'http://www.youtube.com/v/f_roqXByiKI',
+		'ship2myid_reg_link'	=> 'https://hotfix-app.ship2myid.com/web/#/registerMerchant',
+		'ship2myid_doc_link'	=> 'http://www.ship2myid.com/doc/Prestashop_Ship2MyId_Module.pdf',
+		'mod_status' => $enable,
+		));
+
+		return $this->display(__FILE__, 'views/templates/hook/form.tpl');
+	}
+
 
 	public function renderForm()
 	{
@@ -972,6 +1003,9 @@ class Shiptomyid extends Module
 					}
 				}
 				default_state_select.val(current_state);
+			}
+			if($("#SHIPTOMYID_ENABLE").val() != 1){
+				$("#module_form").hide()
 			}
 			console.log("State js load");
 			});</script>',

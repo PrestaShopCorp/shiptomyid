@@ -2,9 +2,9 @@
 <module>
 	<name>shiptomyid</name>
 	<displayName><![CDATA[Ship2MyId]]></displayName>
-	<version><![CDATA[1.0.1]]></version>
-	<description><![CDATA[Send real gifts and packages to an email, 
-		mobile phone or social account, Increase your online transactions, Increasing your customer base.]]></description>
+	<version><![CDATA[1.0.2]]></version>
+	<description><![CDATA[Generate new transactions not possible before. Users can now ship to any cell, 
+		email or social ID without requiring address. It&#039;s like Paypal but for Shipping.]]></description>
 	<author><![CDATA[NewQuest]]></author>
 	<tab><![CDATA[smart_shopping]]></tab>
 	<is_configurable>1</is_configurable>

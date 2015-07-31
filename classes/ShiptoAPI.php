@@ -86,6 +86,17 @@ class ShiptoAPI extends Client
 		return $this->query($data, 'json');
 	}
 
+	/**
+	 * Get Marketplace Details.
+	 */
+	public function getMarketplaceDetails()
+	{
+		$this->getSession();
+
+		$this->method = 'GET';
+		$this->path = '/order/marketplacedetails';
+		return $this->query(array());
+	}
 
 	/**
 	 * Get current status for an order.

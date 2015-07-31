@@ -8,7 +8,7 @@
 *}
 
 <script type="text/javascript">
-	var popup_url = "{$popup_url|escape:'htmlall':'UTF-8'}&callback={$callback_url|urlencode}";
+	var popup_url = "{$popup_url|escape:'htmlall':'UTF-8'}&name={$marketplace_name|urlencode}&image={$marketplace_image|urlencode}&callback={$callback_url|urlencode}";
 	var video_url = "{$video_url|escape:'htmlall':'UTF-8'}";
 	var button_text = "{l s='I want to use Ship2MyId for my order.' mod='shiptomyid'}";
 	var link_text = "{l s='What is Ship2MyId ?' mod='shiptomyid'}";
